@@ -10,10 +10,6 @@ import java.sql.SQLException;
 
 import edu.whimc.positiontracker.Tracker;
 
-/**
- * 
- * @author huwenxuan
- */
 public class MySQLConnection {
 	
 	public static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";

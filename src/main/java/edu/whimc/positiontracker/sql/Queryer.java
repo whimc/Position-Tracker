@@ -15,12 +15,6 @@ import org.bukkit.entity.Player;
 
 import edu.whimc.positiontracker.Tracker;
 
-/**
- * Handles storing position data 
- * @author Jack Henhapl
- *
- */
-
 public class Queryer {
 	
 	public class PositionEntry {
@@ -76,9 +70,6 @@ public class Queryer {
 		});
 	}
 	
-	/**
-	 * Stores position data of all online players.
-	 */
 	public void storePositionData() {
 		final List<PositionEntry> entries = Bukkit.getOnlinePlayers().stream()
 				.map(v -> new PositionEntry(v))
