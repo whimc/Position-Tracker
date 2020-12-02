@@ -1,8 +1,8 @@
-name: WHIMCPositionTracker
-author: Jack Henhapl
-main: edu.whimc.positiontracker.Tracker
+name: ${project.artifactId}
 version: ${project.version}
+author: Jack Henhapl
 api-version: 1.13
+main: edu.whimc.positiontracker.Tracker
 description: Stores the positions of online players to a database.
 commands:
   positiontracker:
