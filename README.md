@@ -1,5 +1,5 @@
-# Position-Tracker
-Plugin to record the positions of players into a database
+# WHIMC-PositionTracker
+Track player positions to a database
 
 ## Building
 Build the source with Maven:
