@@ -3,8 +3,8 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.whimc</groupId>
-	<artifactId>whimc-position-tracker</artifactId>
-	<version>2.0</version>
+	<artifactId>WHIMC-Position-Tracker</artifactId>
+	<version>2.0.2</version>
 	<name>WHIMC Position Tracker</name>
 	<description>Track player positions</description>
 
@@ -30,4 +30,13 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory> <!-- (your resources folder location) -->
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
 </project>
