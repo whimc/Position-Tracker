@@ -1,6 +1,3 @@
-/**
- * 
- */
 package edu.whimc.positiontracker.sql;
 
 import java.sql.Connection;
