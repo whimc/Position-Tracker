@@ -31,12 +31,44 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
+	<!-- Import github release plugin -->
+	<pluginRepositories>
+		<pluginRepository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>bintray-cy6ergn0m-maven</id>
+			<name>bintray-plugins</name>
+			<url>http://dl.bintray.com/cy6ergn0m/maven</url>
+		</pluginRepository>
+	</pluginRepositories>
+	
+	<!-- Repo for plugin -->
+	<scm>
+		<connection>scm:git:git@github.com:whimc/Position-Tracker.git</connection>
+		<tag>HEAD</tag>
+	</scm>
+
 	<build>
+		<!-- Allow pom.xml value substitution in plugin.yml -->
 		<resources>
 			<resource>
-				<directory>src/main/resources</directory> <!-- (your resources folder location) -->
+				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+
+		<!-- Github release settings -->
+		<plugins>
+			<plugin>
+				<groupId>cy.github</groupId>
+				<artifactId>github-release-plugin</artifactId>
+				<version>0.5.1</version>
+
+				<configuration>
+					<releaseTitle>${project.artifactId}-${project.version}</releaseTitle>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 </project>
