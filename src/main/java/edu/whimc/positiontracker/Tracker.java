@@ -11,6 +11,7 @@ public class Tracker extends JavaPlugin {
 	private boolean debug = false;
 	private Queryer queryer;
 	
+	//initialization
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
@@ -34,6 +35,7 @@ public class Tracker extends JavaPlugin {
 		
 	}
 
+	// start plugin, run storePositionData() every 3 seconds
 	public boolean startRunner() {
 		if (taskID != -1) {
 			this.getLogger().warning("The runner has already been started!");
@@ -50,6 +52,7 @@ public class Tracker extends JavaPlugin {
 		return true;
 	}
 
+	// stop plugin
 	public boolean stopRunner() {
 		if (!isRunning()) {
 			return false;
@@ -59,7 +62,8 @@ public class Tracker extends JavaPlugin {
 		taskID = -1;
 		return true;
 	}
-
+	
+	// all functions used for in-game commands
 	public boolean isRunning() {
 		return Bukkit.getScheduler().isQueued(taskID);
 	}

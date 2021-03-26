@@ -13,6 +13,7 @@ public class TrackerCommand implements CommandExecutor{
 		this.plugin = plugin;
 	}
 	
+	// function to handle all commands
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		if (!sender.isOp()) {
 			sender.sendMessage(ChatColor.RED + "You must be OP to use this command!");
@@ -46,12 +47,12 @@ public class TrackerCommand implements CommandExecutor{
 			String message = ChatColor.YELLOW + "PositionTracker is currently ";
 			
 			if (running) {
-				message += ChatColor.GREEN + "Running";
+				message += ChatColor.GREEN + "running";
 			} else {
-				message += ChatColor.RED + "Stopped";
+				message += ChatColor.RED + "stopped";
 			}
 			message += ChatColor.YELLOW + ". " + ChatColor.GRAY + "" + ChatColor.ITALIC + 
-					" (debugger " + (plugin.getDebug() ? "on" : "off") + ")";
+					" (debug messages are currently " + (plugin.getDebug() ? "on" : "off") + ")";
 			
 			sender.sendMessage(message);
 			return true;
@@ -89,19 +90,27 @@ public class TrackerCommand implements CommandExecutor{
 			return true;
 		}
 		
-		sendCommands(sender);
+		if (arg.equalsIgnoreCase("help")) {
+			sendCommands(sender);
+		}
+		
+		sendMessage(ChatColor.RED + "Not a valid argument - /positiontracker for a list of valid commands.")
 		return true;
 	}
 	
+	// prints list of commands
 	private void sendCommands(CommandSender sender) {
 		sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Position Tracker");
 		sender.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + 
+				"   /positiontracker - brings up this menu");
+		sender.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + 
 				"   /positiontracker status - get status of tracker");
 		sender.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + 
-				"   /positiontracker debug - toggle debug messages in console");
+				"   /positiontracker debug - toggle debug messages on/off in console");
 		sender.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + 
 				"   /positiontracker start - starts tracker");
 		sender.sendMessage(ChatColor.RED + "" + ChatColor.ITALIC + 
 				"   /positiontracker stop - stops tracker");
+		
 	}
 }

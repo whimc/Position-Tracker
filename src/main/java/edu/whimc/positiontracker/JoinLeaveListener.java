@@ -14,12 +14,14 @@ public class JoinLeaveListener implements Listener {
 		this.plugin = plugin;
 	}
 	
+	// starts plugin on first player joining
 	@EventHandler
 	public void onJoin(PlayerJoinEvent event) {
 		if (plugin.isRunning()) return;
 		plugin.startRunner();
 	}
 	
+	// stops plugin on last player leaving
 	@EventHandler
 	public void onLeave(PlayerQuitEvent event) {
 		if (Bukkit.getOnlinePlayers().size() != 0) return;

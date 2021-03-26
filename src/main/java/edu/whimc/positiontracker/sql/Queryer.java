@@ -24,6 +24,7 @@ public class Queryer {
         private final UUID uuid;
         private final Timestamp time;
 
+        // list of data tracked
         public PositionEntry(Player player) {
             Location loc = player.getLocation();
             this.x = loc.getBlockX();
@@ -36,6 +37,7 @@ public class Queryer {
             this.time = new Timestamp(System.currentTimeMillis());
         }
 
+        // adds data to sql batch
         public void addInsertionToBatch(PreparedStatement statement) throws SQLException {
             statement.setInt(1, x);
             statement.setInt(2, y);
@@ -58,6 +60,7 @@ public class Queryer {
     private Tracker plugin;
     private MySQLConnection sqlConnection;
 
+    // initializes sql connection + position tracker
     public Queryer(Tracker plugin, Consumer<Boolean> callback) {
         this.plugin = plugin;
         this.sqlConnection = new MySQLConnection(plugin);
@@ -70,6 +73,7 @@ public class Queryer {
         });
     }
 
+    // checks for player positions and stores in database
     public void storePositionData() {
         final List<PositionEntry> entries = Bukkit.getOnlinePlayers().stream()
                 .map(PositionEntry::new)

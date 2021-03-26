@@ -28,6 +28,7 @@ public class MySQLConnection {
 	private String host, database, username, password, url;
 	private int port;
 	
+	// initialize mysql info
 	public MySQLConnection(Tracker plugin) {
 		this.host = plugin.getConfig().getString("mysql.host", "localhost");
 		this.port = plugin.getConfig().getInt("mysql.port", 3306);
@@ -38,6 +39,7 @@ public class MySQLConnection {
 		this.url = String.format(URL_TEMPLATE, host, port, database);
 	}
 	
+	// initialize table
 	public boolean initialize() {
 		if (getConnection() == null) {
 			return false;
@@ -53,6 +55,7 @@ public class MySQLConnection {
 		return true;
 	}
 	
+	// connect to database
 	public Connection getConnection() {
 		try {
 			if (this.connection != null && !this.connection.isClosed()) {
@@ -68,6 +71,7 @@ public class MySQLConnection {
 		return this.connection;
 	}
 	
+	// close connection
 	public void closeConnection() {
 		if (this.connection != null) {
 			try {
