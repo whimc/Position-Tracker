@@ -30,21 +30,27 @@ public class Queryer {
             this.y = loc.getBlockY();
             this.z = loc.getBlockZ();
             this.world = loc.getWorld().getName();
-            this.biome = loc.getBlock().getBiome().name();
+            String biome;
+            try {
+                biome = loc.getBlock().getBiome().name();
+            } catch(Exception e) {
+                biome = "unknown";
+            }
+            this.biome = biome;
             this.username = player.getName();
             this.uuid = player.getUniqueId();
             this.time = new Timestamp(System.currentTimeMillis());
         }
 
         public void addInsertionToBatch(PreparedStatement statement) throws SQLException {
-            statement.setInt(1, x);
-            statement.setInt(2, y);
-            statement.setInt(3, z);
-            statement.setString(4, world);
-            statement.setString(5, biome);
-            statement.setString(6, username);
-            statement.setString(7, uuid.toString());
-            statement.setLong(8, time.getTime() / 1000);
+            statement.setInt(1, this.x);
+            statement.setInt(2, this.y);
+            statement.setInt(3, this.z);
+            statement.setString(4, this.world);
+            statement.setString(5, this.biome);
+            statement.setString(6, this.username);
+            statement.setString(7, this.uuid.toString());
+            statement.setLong(8, this.time.getTime() / 1000);
             statement.addBatch();
         }
 
@@ -63,7 +69,7 @@ public class Queryer {
         this.sqlConnection = new MySQLConnection(plugin);
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            final boolean success = sqlConnection.initialize();
+            final boolean success = this.sqlConnection.initialize();
             Bukkit.getScheduler().runTask(plugin, () -> {
                 callback.accept(success);
             });
