@@ -48,19 +48,19 @@
 
 		<!-- Github release settings -->
 		<plugin>
-				<groupId>de.jutzig</groupId>
-				<artifactId>github-release-plugin</artifactId>
-				<version>1.1.1</version>
-				<configuration>
-					<description>Release for v${project.version}</description>
-					<releaseName>${project.artifactId}-${project.version}</releaseName>
-					<tag>${project.version}</tag>
-					<fileSets>
-						<fileSet>
-							<directory>${project.build.directory}</directory>
-						</fileSet>
-					</fileSets>
-				</configuration>
-			</plugin>
+			<groupId>de.jutzig</groupId>
+			<artifactId>github-release-plugin</artifactId>
+			<version>1.1.1</version>
+			<configuration>
+				<description>Release for v${project.version}</description>
+				<releaseName>${project.artifactId}-${project.version}</releaseName>
+				<tag>${project.version}</tag>
+				<fileSets>
+					<fileSet>
+						<directory>${project.build.directory}</directory>
+					</fileSet>
+				</fileSets>
+			</configuration>
+		</plugin>
 	</build>
 </project>
