@@ -57,7 +57,7 @@ public class Queryer {
         }
 
         /**
-         * Adds an SQL Insertion with the PositionEntry data.
+         * Adds this entry's data to the PreparedStatement's batch
          *
          * @param statement the SQL PreparedStatement.
          * @throws SQLException when the statement cannot be added.
@@ -76,7 +76,7 @@ public class Queryer {
 
     }
 
-    /** The formatting for a data insertion. */
+    /** SQL query to insert position data. */
     private static final String INSERT_FORMAT =
             "INSERT INTO `whimc_player_positions` " +
                     "(x, y, z, world, biome, username, uuid, time) " +
@@ -114,7 +114,7 @@ public class Queryer {
                 .map(PositionEntry::new)
                 .collect(Collectors.toList());
 
-        // add data to database if connection exists
+        // add data to database asynchronously
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
             try (Connection connection = this.sqlConnection.getConnection()) {
                 connection.setAutoCommit(false);
