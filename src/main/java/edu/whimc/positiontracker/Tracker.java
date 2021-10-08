@@ -5,12 +5,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import edu.whimc.positiontracker.sql.Queryer;
 
+/**
+ * The main plugin class.
+ */
 public class Tracker extends JavaPlugin {
-
+	/** The current Task's ID. */
 	private int taskID = -1;
+	/** The debug mode status. */
 	private boolean debug = false;
+	/** The Queryer for the SQL database */
 	private Queryer queryer;
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
@@ -34,7 +42,13 @@ public class Tracker extends JavaPlugin {
 		
 	}
 
+	/**
+	 * Starts player location data collection.
+	 *
+	 * @return whether or not the data collection has been successfully started.
+	 */
 	public boolean startRunner() {
+		// check if already running
 		if (taskID != -1) {
 			this.getLogger().warning("The runner has already been started!");
 			return false;
@@ -50,7 +64,13 @@ public class Tracker extends JavaPlugin {
 		return true;
 	}
 
+	/**
+	 * Stops player data collection.
+	 *
+	 * @return whether or not the data collection has been successfully stopped.
+	 */
 	public boolean stopRunner() {
+		// check if already stopped
 		if (!isRunning()) {
 			return false;
 		}
@@ -60,23 +80,41 @@ public class Tracker extends JavaPlugin {
 		return true;
 	}
 
+	/**
+	 * @return if the data collection is running.
+	 */
 	public boolean isRunning() {
 		return Bukkit.getScheduler().isQueued(taskID);
 	}
 
+	/**
+	 * @return the current task ID.
+	 */
 	public int getTaskID() {
 		return taskID;
 	}
 
+	/**
+	 * Prints the passed String into the server logs.
+	 *
+	 * @param str the String to print.
+	 */
 	public void debugLog(String str) {
+		// check if in debug mode
 		if (!this.debug) return;
 		this.getLogger().info(str);
 	}
 
+	/**
+	 * @return whether or not debug mode is enabled.
+	 */
 	public boolean getDebug() {
 		return this.debug;
 	}
 
+	/**
+	 * @param bool the debug desired status (true = on, false = off).
+	 */
 	public void setDebug(boolean bool) {
 		this.debug = bool;
 	}

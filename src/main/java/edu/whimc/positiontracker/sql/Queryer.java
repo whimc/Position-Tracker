@@ -15,15 +15,29 @@ import org.bukkit.entity.Player;
 
 import edu.whimc.positiontracker.Tracker;
 
+/**
+ * Handles adding position data to the SQL Database.
+ */
 public class Queryer {
 
+    /**
+     * An entry containing data on the current player's position and time it was created.
+     */
     public class PositionEntry {
-
+        /** The x, y, and z coordinates representing the position. */
         private final int x, y, z;
+        /** The current world, biome, and player's username. */
         private final String world, biome, username;
+        /** The unique ID for this entry. */
         private final UUID uuid;
+        /** The time the entry was created. */
         private final Timestamp time;
 
+        /**
+         * Constructs a PositionEntry.
+         *
+         * @param player the current player.
+         */
         public PositionEntry(Player player) {
             Location loc = player.getLocation();
             this.x = loc.getBlockX();
@@ -42,6 +56,12 @@ public class Queryer {
             this.time = new Timestamp(System.currentTimeMillis());
         }
 
+        /**
+         * Adds this entry's data to the PreparedStatement's batch
+         *
+         * @param statement the SQL PreparedStatement.
+         * @throws SQLException when the statement cannot be added.
+         */
         public void addInsertionToBatch(PreparedStatement statement) throws SQLException {
             statement.setInt(1, this.x);
             statement.setInt(2, this.y);
@@ -56,14 +76,23 @@ public class Queryer {
 
     }
 
+    /** SQL query to insert position data. */
     private static final String INSERT_FORMAT =
             "INSERT INTO `whimc_player_positions` " +
                     "(x, y, z, world, biome, username, uuid, time) " +
                     "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
+    /** The instance of the plugin. */
     private Tracker plugin;
+    /** The connection to the SQL database. */
     private MySQLConnection sqlConnection;
 
+    /**
+     * Constructs a Queryer.
+     *
+     * @param plugin the instance of the plugin.
+     * @param callback the event callback.
+     */
     public Queryer(Tracker plugin, Consumer<Boolean> callback) {
         this.plugin = plugin;
         this.sqlConnection = new MySQLConnection(plugin);
@@ -76,11 +105,16 @@ public class Queryer {
         });
     }
 
+    /**
+     * Stores the position data.
+     */
     public void storePositionData() {
+        // get position data for all online players
         final List<PositionEntry> entries = Bukkit.getOnlinePlayers().stream()
                 .map(PositionEntry::new)
                 .collect(Collectors.toList());
 
+        // add data to database asynchronously
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
             try (Connection connection = this.sqlConnection.getConnection()) {
                 connection.setAutoCommit(false);
