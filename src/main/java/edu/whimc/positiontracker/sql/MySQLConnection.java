@@ -12,7 +12,7 @@ import edu.whimc.positiontracker.Tracker;
  */
 public class MySQLConnection {
 	/** The SQL Driver class package. */
-	public static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
+	public static final String DRIVER_CLASS = "com.mysql.cj.jdbc.Driver";
 	/** The template for the URL. */
 	public static final String URL_TEMPLATE = "jdbc:mysql://%s:%s/%s";
 	/** The SQL command to create a table. */
