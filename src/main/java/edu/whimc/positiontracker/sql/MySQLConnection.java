@@ -11,8 +11,6 @@ import edu.whimc.positiontracker.Tracker;
  * Handles the connection to the SQL database.
  */
 public class MySQLConnection {
-	/** The SQL Driver class package. */
-	public static final String DRIVER_CLASS = "com.mysql.cj.jdbc.Driver";
 	/** The template for the URL. */
 	public static final String URL_TEMPLATE = "jdbc:mysql://%s:%s/%s";
 	/** The SQL command to create a table. */
@@ -88,9 +86,8 @@ public class MySQLConnection {
 			}
 
 			// try connecting if a connection doesn't currently exist
-			Class.forName(DRIVER_CLASS);
 			this.connection = DriverManager.getConnection(this.url, this.username, this.password);
-		} catch (SQLException | ClassNotFoundException e) {
+		} catch (SQLException ignored) {
 			return null;
 		}
 		
