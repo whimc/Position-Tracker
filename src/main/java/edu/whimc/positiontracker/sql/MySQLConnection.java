@@ -1,18 +1,21 @@
 package edu.whimc.positiontracker.sql;
 
+import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
+import com.mysql.cj.jdbc.MysqlDataSource;
+import com.mysql.cj.x.protobuf.MysqlxPrepare;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import edu.whimc.positiontracker.Tracker;
+import org.bukkit.configuration.ConfigurationSection;
 
 /**
  * Handles the connection to the SQL database.
  */
 public class MySQLConnection {
-	/** The template for the URL. */
-	public static final String URL_TEMPLATE = "jdbc:mysql://%s:%s/%s";
+
 	/** The SQL command to create a table. */
 	public static final String CREATE_TABLE =
 			"CREATE TABLE IF NOT EXISTS `whimc_player_positions` (" +
@@ -27,12 +30,7 @@ public class MySQLConnection {
 			"  `time` 	  BIGINT                NOT NULL," +
 			"  PRIMARY KEY (`rowid`));";
 
-	/** The connection to the SQL database. */
-	private Connection connection;
-	/** The SQL database credentials. */
-	private String host, database, username, password, url;
-	/** The SQL database port. */
-	private int port;
+	private MysqlDataSource dataSource;
 
 	/**
 	 * Constructs a MySQLConnection.
@@ -40,72 +38,47 @@ public class MySQLConnection {
 	 * @param plugin The instance of the plugin.
 	 */
 	public MySQLConnection(Tracker plugin) {
-		// fetch credentials and database info from config
-		this.host = plugin.getConfig().getString("mysql.host", "localhost");
-		this.port = plugin.getConfig().getInt("mysql.port", 3306);
-		this.database = plugin.getConfig().getString("mysql.database", "minecraft");
-		this.username = plugin.getConfig().getString("mysql.username", "user");
-		this.password = plugin.getConfig().getString("mysql.password", "pass");
+		this.dataSource = new MysqlConnectionPoolDataSource();
 
-		// create the URL with the fetched information
-		this.url = String.format(URL_TEMPLATE, host, port, database);
+		ConfigurationSection config = plugin.getConfig();
+		this.dataSource.setServerName(config.getString("mysql.host", "localhost"));
+		this.dataSource.setPortNumber(config.getInt("mysql.port", 3306));
+		this.dataSource.setDatabaseName(config.getString("mysql.database", "minecraft"));
+		this.dataSource.setUser(config.getString("mysql.username", "user"));
+		this.dataSource.setPassword(config.getString("mysql.password", "pass"));
 	}
 
 	/**
-	 *	Initializes the MySQLConnection.
+	 * Attempt to connect to the database and create/update the schema.
 	 *
-	 * @return true if the connection succeeds.
+	 * @return Whether the database was successfully initialized.
 	 */
 	public boolean initialize() {
-		// ensure there is a connection
-		if (getConnection() == null) {
+		try (Connection connection = getConnection()) {
+			if (connection == null) {
+				return false;
+			}
+
+			try (PreparedStatement statement = connection.prepareStatement(CREATE_TABLE)) {
+				statement.execute();
+			}
+		} catch (SQLException unused) {
 			return false;
 		}
-		
-		try {
-			// create a table
-			PreparedStatement statement = this.connection.prepareStatement(CREATE_TABLE);
-			statement.execute();
-		} catch (SQLException e) {
-			return false;
-		}
-		
+
 		return true;
 	}
 
 	/**
-	 * Fetches the connection to the SQL database.
-	 *
-	 * @return the SQL database Connection.
+	 * A connection to the configured database or null if unsuccessful.
 	 */
-	public Connection getConnection() {
-		try {
-			// ensure connection exists and is open
-			if (this.connection != null && !this.connection.isClosed()) {
-				return this.connection;
-			}
-
-			// try connecting if a connection doesn't currently exist
-			this.connection = DriverManager.getConnection(this.url, this.username, this.password);
-		} catch (SQLException ignored) {
+	public Connection getConnection() throws SQLException {
+		Connection connection = this.dataSource.getConnection();
+		if (!connection.isValid(1)) {
 			return null;
 		}
-		
-		return this.connection;
-	}
 
-	/**
-	 * Closes the connection to the SQL database.
-	 */
-	public void closeConnection() {
-		// ensure connection exists
-		if (this.connection != null) {
-			try {
-				this.connection.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
+		return connection;
 	}
 
 }
