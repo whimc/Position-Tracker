@@ -55,11 +55,11 @@ public class Tracker extends JavaPlugin {
 		}
 
 		taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
-			if (Bukkit.getOnlinePlayers().size() != 0) {
+			if (!Bukkit.getOnlinePlayers().isEmpty()) {
 				debugLog("Logging for " + Bukkit.getOnlinePlayers().size() + " player(s)...");
 				this.queryer.storePositionData();
 			}
-		}, 20 * 3, 20 * 3);
+		}, 20 * 2, 20 * 2); //every 2 seconds
 
 		return true;
 	}
@@ -90,9 +90,9 @@ public class Tracker extends JavaPlugin {
 	/**
 	 * @return the current task ID.
 	 */
-	public int getTaskID() {
-		return taskID;
-	}
+	//public int getTaskID() {
+	//	return taskID;
+	//}
 
 	/**
 	 * Prints the passed String into the server logs.
