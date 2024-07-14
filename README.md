@@ -2,6 +2,7 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/whimc/Position-Tracker?label=download&logo=github)](https://github.com/whimc/Position-Tracker/releases/latest)
 
 PositionTracker is a Minecraft plugin that tracks player positions and stores them in an SQL database.
+It also tracks WorldGuard region entry/exit events.
 
 ---
 
@@ -17,16 +18,19 @@ $ mvn install
 
 `debug` is a `boolean` that toggles debug messages in the console.
 
+`position_poll_interval_seconds` is how often (in seconds) to grab position data.
+
+`flush_interval_seconds` is how often (in seconds) to insert data into the db.
+
 ### MySQL
-| Key	                             | Type	     | Description                          |
-|----------------------------------|-----------|--------------------------------------|
-| `mysql.host`	                    | `string`  | The host of the database             |
-| `mysql.port`	                    | `integer` | The port of the database             |
-| `mysql.database`                 | `string`  | The name of the database to use      |
-| `mysql.username`                 | `string`  | Username for credentials             |
-| `mysql.password`                 | `string`  | Password for credentials             |
-| `position_poll_interval_seconds` | `integer` | How often to poll position data      |
-| `flush_interval_seconds`         | `integer` | How often to insert data into the db |
+| Key	           | Type	   | Description                     |
+|------------------|-----------|---------------------------------|
+| `mysql.host`	   | `string`  | The host of the database        |
+| `mysql.port`	   | `integer` | The port of the database        |
+| `mysql.database` | `string`  | The name of the database to use |
+| `mysql.username` | `string`  | Username for credentials        |
+| `mysql.password` | `string`  | Password for credentials        |
+
 
 #### Example
 ```yaml
