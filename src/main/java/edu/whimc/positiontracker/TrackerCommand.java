@@ -10,14 +10,14 @@ import org.bukkit.command.CommandSender;
  */
 public class TrackerCommand implements CommandExecutor{
 	/** The instance of the plugin. */
-	private Tracker plugin;
+	private PositionTracker plugin;
 
 	/**
 	 * Constructs a TrackerCommand.
 	 *
 	 * @param plugin the instance of the plugin.
 	 */
-	public TrackerCommand(Tracker plugin) {
+	public TrackerCommand(PositionTracker plugin) {
 		this.plugin = plugin;
 	}
 
@@ -42,19 +42,19 @@ public class TrackerCommand implements CommandExecutor{
 		// toggling debug mode
 		if (arg.equalsIgnoreCase("debug")) {
 			String message = ChatColor.YELLOW + "Console debug messages are now ";
-			if (plugin.getDebug()) {
+			if (plugin.isDebug()) {
 				message += ChatColor.RED + "off";
 			} else {
 				message += ChatColor.GREEN + "on";
 			}
 			
-			plugin.setDebug(!plugin.getDebug());
+			plugin.setDebug(!plugin.isDebug());
 			sender.sendMessage(message);
 			
 			return true;
 		}
 		
-		boolean running = plugin.isRunning();
+		boolean running = plugin.getDataStore().isRunning();
 
 		// checking plugin status
 		if (arg.equalsIgnoreCase("status")) {
@@ -66,7 +66,7 @@ public class TrackerCommand implements CommandExecutor{
 				message += ChatColor.RED + "Stopped";
 			}
 			message += ChatColor.YELLOW + ". " + ChatColor.GRAY + "" + ChatColor.ITALIC + 
-					" (debugger " + (plugin.getDebug() ? "on" : "off") + ")";
+					" (debugger " + (plugin.isDebug() ? "on" : "off") + ")";
 			
 			sender.sendMessage(message);
 			return true;
@@ -80,13 +80,8 @@ public class TrackerCommand implements CommandExecutor{
 				return true;
 			}
 			
-			boolean success = plugin.startRunner();
-			if (success) {
-				sender.sendMessage(ChatColor.GREEN + "Tracker started!");
-			} else {
-				sender.sendMessage(ChatColor.RED + "There was an error! Check console.");
-			}
-			
+			plugin.getDataStore().run();
+			sender.sendMessage(ChatColor.GREEN + "PositionTracker started!");
 			return true;
 		}
 
@@ -98,13 +93,8 @@ public class TrackerCommand implements CommandExecutor{
 				return true;
 			}
 			
-			boolean success = plugin.stopRunner();
-			if (success) {
-				sender.sendMessage(ChatColor.GREEN + "Tracker stopped!");
-			} else {
-				sender.sendMessage(ChatColor.RED + "There was an error! Check console.");
-			}
-			
+			plugin.getDataStore().stop();
+			sender.sendMessage(ChatColor.GREEN + "PositionTracker stopped!");
 			return true;
 		}
 

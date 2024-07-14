@@ -5,4 +5,5 @@ mysql:
     database: minecraft
     username: user
     password: pass
-    
+position_poll_interval_seconds: 2
+flush_interval_seconds: 15
