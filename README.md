@@ -18,13 +18,15 @@ $ mvn install
 `debug` is a `boolean` that toggles debug messages in the console.
 
 ### MySQL
-| Key	           | Type	   | Description                     |
-|------------------|-----------|---------------------------------|
-| `mysql.host`	   | `string`  | The host of the database        |
-| `mysql.port`	   | `integer` | The port of the database        |
-| `mysql.database` | `string`  | The name of the database to use |
-| `mysql.username` | `string`  | Username for credentials        |
-| `mysql.password` | `string`  | Password for credentials        |
+| Key	                             | Type	     | Description                          |
+|----------------------------------|-----------|--------------------------------------|
+| `mysql.host`	                    | `string`  | The host of the database             |
+| `mysql.port`	                    | `integer` | The port of the database             |
+| `mysql.database`                 | `string`  | The name of the database to use      |
+| `mysql.username`                 | `string`  | Username for credentials             |
+| `mysql.password`                 | `string`  | Password for credentials             |
+| `position_poll_interval_seconds` | `integer` | How often to poll position data      |
+| `flush_interval_seconds`         | `integer` | How often to insert data into the db |
 
 #### Example
 ```yaml
@@ -35,6 +37,8 @@ mysql:
     database: minecraft
     username: user
     password: pass
+position_poll_interval_seconds: 2
+flush_interval_seconds: 15
 ```
 
 ---
