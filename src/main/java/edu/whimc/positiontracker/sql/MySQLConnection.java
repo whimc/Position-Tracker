@@ -2,13 +2,11 @@ package edu.whimc.positiontracker.sql;
 
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
-import com.mysql.cj.x.protobuf.MysqlxPrepare;
+import edu.whimc.positiontracker.PositionTracker;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import edu.whimc.positiontracker.Tracker;
 import org.bukkit.configuration.ConfigurationSection;
 
 /**
@@ -17,7 +15,7 @@ import org.bukkit.configuration.ConfigurationSection;
 public class MySQLConnection {
 
 	/** The SQL command to create a table. */
-	public static final String CREATE_TABLE =
+	public static final String CREATE_POSITIONS_TABLE =
 			"CREATE TABLE IF NOT EXISTS `whimc_player_positions` (" +
 			"  `rowid`    BIGINT AUTO_INCREMENT NOT NULL," +
 			"  `x`        INT                   NOT NULL," +
@@ -30,6 +28,21 @@ public class MySQLConnection {
 			"  `time` 	  BIGINT                NOT NULL," +
 			"  PRIMARY KEY (`rowid`));";
 
+	public static final String CREATE_REGIONS_TABLE =
+			"CREATE TABLE IF NOT EXISTS `whimc_player_region_events` (" +
+			"  `rowid`    BIGINT AUTO_INCREMENT NOT NULL," +
+			"  `region`   VARCHAR(64) NOT NULL," +
+			"  `trigger`  VARCHAR(16) NOT NULL," +
+			"  `isEnter`  BIT(1) NOT NULL," +
+			"  `x`        INT                   NOT NULL," +
+			"  `y`        INT                   NOT NULL," +
+			"  `z`        INT                   NOT NULL," +
+			"  `world`    VARCHAR(64)           NOT NULL," +
+			"  `username` VARCHAR(16)           NOT NULL," +
+			"  `uuid`     VARCHAR(36)           NOT NULL," +
+			"  `time` 	  BIGINT                NOT NULL," +
+			"  PRIMARY KEY (`rowid`));";
+
 	private MysqlDataSource dataSource;
 
 	/**
@@ -37,7 +50,7 @@ public class MySQLConnection {
 	 *
 	 * @param plugin The instance of the plugin.
 	 */
-	public MySQLConnection(Tracker plugin) {
+	public MySQLConnection(PositionTracker plugin) {
 		this.dataSource = new MysqlConnectionPoolDataSource();
 
 		ConfigurationSection config = plugin.getConfig();
@@ -59,7 +72,10 @@ public class MySQLConnection {
 				return false;
 			}
 
-			try (PreparedStatement statement = connection.prepareStatement(CREATE_TABLE)) {
+			try (PreparedStatement statement = connection.prepareStatement(CREATE_POSITIONS_TABLE)) {
+				statement.execute();
+			}
+			try (PreparedStatement statement = connection.prepareStatement(CREATE_REGIONS_TABLE)) {
 				statement.execute();
 			}
 		} catch (SQLException unused) {
