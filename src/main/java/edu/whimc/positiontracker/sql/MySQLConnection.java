@@ -3,6 +3,7 @@ package edu.whimc.positiontracker.sql;
 import com.mysql.cj.jdbc.MysqlConnectionPoolDataSource;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import edu.whimc.positiontracker.PositionTracker;
+import edu.whimc.positiontracker.sql.migration.SchemaManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,36 +15,9 @@ import org.bukkit.configuration.ConfigurationSection;
  */
 public class MySQLConnection {
 
-	/** The SQL command to create a table. */
-	public static final String CREATE_POSITIONS_TABLE =
-			"CREATE TABLE IF NOT EXISTS `whimc_player_positions` (" +
-			"  `rowid`    BIGINT AUTO_INCREMENT NOT NULL," +
-			"  `x`        INT                   NOT NULL," +
-			"  `y`        INT                   NOT NULL," +
-			"  `z`        INT                   NOT NULL," +
-			"  `world`    VARCHAR(64)           NOT NULL," +
-			"  `biome`    VARCHAR(64)           NOT NULL," +
-			"  `username` VARCHAR(16)           NOT NULL," +
-			"  `uuid`     VARCHAR(36)           NOT NULL," +
-			"  `time` 	  BIGINT                NOT NULL," +
-			"  PRIMARY KEY (`rowid`));";
+	private final MysqlDataSource dataSource;
 
-	public static final String CREATE_REGIONS_TABLE =
-			"CREATE TABLE IF NOT EXISTS `whimc_player_region_events` (" +
-			"  `rowid`    BIGINT AUTO_INCREMENT NOT NULL," +
-			"  `region`   VARCHAR(64) NOT NULL," +
-			"  `trigger`  VARCHAR(16) NOT NULL," +
-			"  `isEnter`  BIT(1) NOT NULL," +
-			"  `x`        INT                   NOT NULL," +
-			"  `y`        INT                   NOT NULL," +
-			"  `z`        INT                   NOT NULL," +
-			"  `world`    VARCHAR(64)           NOT NULL," +
-			"  `username` VARCHAR(16)           NOT NULL," +
-			"  `uuid`     VARCHAR(36)           NOT NULL," +
-			"  `time` 	  BIGINT                NOT NULL," +
-			"  PRIMARY KEY (`rowid`));";
-
-	private MysqlDataSource dataSource;
+	private final PositionTracker plugin;
 
 	/**
 	 * Constructs a MySQLConnection.
@@ -52,6 +26,7 @@ public class MySQLConnection {
 	 */
 	public MySQLConnection(PositionTracker plugin) {
 		this.dataSource = new MysqlConnectionPoolDataSource();
+		this.plugin = plugin;
 
 		ConfigurationSection config = plugin.getConfig();
 		this.dataSource.setServerName(config.getString("mysql.host", "localhost"));
@@ -72,17 +47,11 @@ public class MySQLConnection {
 				return false;
 			}
 
-			try (PreparedStatement statement = connection.prepareStatement(CREATE_POSITIONS_TABLE)) {
-				statement.execute();
-			}
-			try (PreparedStatement statement = connection.prepareStatement(CREATE_REGIONS_TABLE)) {
-				statement.execute();
-			}
+			SchemaManager manager = new SchemaManager(this.plugin, this);
+			return manager.initialize();
 		} catch (SQLException unused) {
 			return false;
 		}
-
-		return true;
 	}
 
 	/**

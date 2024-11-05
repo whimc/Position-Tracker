@@ -13,8 +13,8 @@ import org.bukkit.entity.Player;
 public class PositionEntry extends DataEntry {
 
     public static final String INSERT_QUERY =
-            "INSERT INTO `whimc_player_positions` (`x`, `y`, `z`, `world`, `biome`, `username`, `uuid`, `time`) " +
-                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO `whimc_player_positions` (`x`, `y`, `z`, `world`, `biome`, `username`, `gamemode`, `uuid`, `time`) " +
+                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The x, y, and z coordinates representing the position.
@@ -23,7 +23,7 @@ public class PositionEntry extends DataEntry {
     /**
      * The current world, biome, and player's username.
      */
-    private final String world, biome, username;
+    private final String world, biome, username, gamemode;
     /**
      * The unique ID for this entry.
      */
@@ -52,6 +52,7 @@ public class PositionEntry extends DataEntry {
         }
         this.biome = biome;
         this.username = player.getName();
+        this.gamemode = player.getGameMode().name();
         this.uuid = player.getUniqueId();
         this.time = new Timestamp(System.currentTimeMillis());
     }
@@ -69,8 +70,9 @@ public class PositionEntry extends DataEntry {
         statement.setString(4, this.world);
         statement.setString(5, this.biome);
         statement.setString(6, this.username);
-        statement.setString(7, this.uuid.toString());
-        statement.setLong(8, this.time.getTime() / 1000);
+        statement.setString(7, this.gamemode);
+        statement.setString(8, this.uuid.toString());
+        statement.setLong(9, this.time.getTime() / 1000);
         statement.addBatch();
     }
 
