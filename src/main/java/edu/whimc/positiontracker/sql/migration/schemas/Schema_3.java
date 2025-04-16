@@ -36,9 +36,13 @@ public class Schema_3 extends SchemaVersion {
         }
 
         // Update player_region_events table
-        try (PreparedStatement addRegionYaw = connection.prepareStatement(ADD_REGION_YAW)) {
-            addRegionYaw.execute();
+        try (PreparedStatement addYaw = connection.prepareStatement(ADD_POS_YAW)) {
+            addYaw.execute();
+            System.out.println("✓ Adding Yaw, Pitch and Region Members");
+        } catch (SQLException e) {
+            System.err.println("✗ Could not add to whimc_player_positions: " + e.getMessage());
         }
+
         try (PreparedStatement addRegionPitch = connection.prepareStatement(ADD_REGION_PITCH)) {
             addRegionPitch.execute();
         }
