@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>edu.whimc</groupId>
 	<artifactId>WHIMC-PositionTracker</artifactId>
-	<version>3.2.1</version>
+	<version>3.2.2</version>
 	<name>WHIMC Position Tracker</name>
 	<description>Track player positions to a database</description>
 
