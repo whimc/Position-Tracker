@@ -13,13 +13,14 @@ import org.bukkit.entity.Player;
 public class PositionEntry extends DataEntry {
 
     public static final String INSERT_QUERY =
-            "INSERT INTO `whimc_player_positions` (`x`, `y`, `z`, `world`, `biome`, `username`, `gamemode`, `uuid`, `time`) " +
-                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO `whimc_player_positions` (`x`, `y`, `z`, `yaw`, `pitch`, `world`, `biome`, `username`, `gamemode`, `uuid`, `time`) " +
+                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
-     * The x, y, and z coordinates representing the position.
+     * The x, y, and z coordinates representing the position. Yaw and Pitch for player facing.
      */
     private final int x, y, z;
+    private final float yaw, pitch;
     /**
      * The current world, biome, and player's username.
      */
@@ -43,6 +44,8 @@ public class PositionEntry extends DataEntry {
         this.x = loc.getBlockX();
         this.y = loc.getBlockY();
         this.z = loc.getBlockZ();
+        this.yaw = loc.getYaw();
+        this.pitch = loc.getPitch();
         this.world = loc.getWorld().getName();
         String biome;
         try {
@@ -67,12 +70,14 @@ public class PositionEntry extends DataEntry {
         statement.setInt(1, this.x);
         statement.setInt(2, this.y);
         statement.setInt(3, this.z);
-        statement.setString(4, this.world);
-        statement.setString(5, this.biome);
-        statement.setString(6, this.username);
-        statement.setString(7, this.gamemode);
-        statement.setString(8, this.uuid.toString());
-        statement.setLong(9, this.time.getTime() / 1000);
+        statement.setFloat(4, this.yaw);
+        statement.setFloat(5, this.pitch);
+        statement.setString(6, this.world);
+        statement.setString(7, this.biome);
+        statement.setString(8, this.username);
+        statement.setString(9, this.gamemode);
+        statement.setString(10, this.uuid.toString());
+        statement.setLong(11, this.time.getTime() / 1000);
         statement.addBatch();
     }
 

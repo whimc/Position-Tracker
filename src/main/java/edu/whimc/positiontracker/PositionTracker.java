@@ -41,6 +41,9 @@ public class PositionTracker extends JavaPlugin {
             this.wgPlayerCache = new WgPlayerCache(this);
             Bukkit.getPluginManager().registerEvents(new RegionListeners(this, this.wgPlayerCache), this);
             Bukkit.getPluginManager().registerEvents(new RegionEnterLeaveListener(this), this);
+            this.getLogger().info("WorldGuard integration enabled.");
+        } else {
+            this.getLogger().info("WorldGuard not found. Skipping region tracking.");
         }
 
         this.dataStore = new DataStore(this, success -> {

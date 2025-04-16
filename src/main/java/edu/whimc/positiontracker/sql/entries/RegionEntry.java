@@ -12,13 +12,17 @@ import org.bukkit.Location;
 public class RegionEntry extends DataEntry {
 
     public static final String INSERT_QUERY =
-            "INSERT INTO `whimc_player_region_events` (`region`, `trigger`, `isEnter`, `x`, `y`, `z`, `world`, `username`, `uuid`, `time`) " +
-                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO `whimc_player_region_events` (`region`, `region_members`, `trigger`, `isEnter`, `x`, `y`, `z`, `yaw`, `pitch`, `world`, `username`, `uuid`, `time`) " +
+                    "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     /**
      * The region's name.
      */
     private final String regionName;
+    /**
+     * The members of the region at the time of the event.
+     */
+    private final String regionMembers;
     /**
      * The type of action that caused the event.
      */
@@ -28,9 +32,10 @@ public class RegionEntry extends DataEntry {
      */
     private final boolean isEnter;
     /**
-     * The x, y, and z coordinates representing the position.
+     * The x, y, and z coordinates representing the position as well as the angle they're looking.
      */
     private final int x, y, z;
+    private final float yaw, pitch;
     /**
      * The current world and player's username.
      */
@@ -47,11 +52,14 @@ public class RegionEntry extends DataEntry {
     public RegionEntry(RegionEvent event) {
         Location loc = event.getLocation();
         this.regionName = event.getRegion().getId();
+        this.regionMembers = String.join(",", event.getRegion().getMembers().getPlayers());
         this.trigger = event.getTrigger();
         this.isEnter = event instanceof RegionLeaveEvent;
         this.x = loc.getBlockX();
         this.y = loc.getBlockY();
         this.z = loc.getBlockZ();
+        this.yaw = loc.getYaw();
+        this.pitch = loc.getPitch();
         this.world = loc.getWorld().getName();
         this.username = event.getPlayer().getName();
         this.uuid = event.getPlayer().getUniqueId();
@@ -61,15 +69,18 @@ public class RegionEntry extends DataEntry {
     @Override
     public void addToStatement(PreparedStatement statement) throws SQLException {
         statement.setString(1, this.regionName);
-        statement.setString(2, this.trigger.toString());
-        statement.setBoolean(3, this.isEnter);
-        statement.setInt(4, this.x);
-        statement.setInt(5, this.y);
-        statement.setInt(6, this.z);
-        statement.setString(7, this.world);
-        statement.setString(8, this.username);
-        statement.setString(9, this.uuid.toString());
-        statement.setLong(10, this.time.getTime() / 1000);
+        statement.setString(2, this.regionMembers);
+        statement.setString(3, this.trigger.toString());
+        statement.setBoolean(4, this.isEnter);
+        statement.setInt(5, this.x);
+        statement.setInt(6, this.y);
+        statement.setInt(7, this.z);
+        statement.setFloat(8, this.yaw);
+        statement.setFloat(9, this.pitch);
+        statement.setString(10, this.world);
+        statement.setString(11, this.username);
+        statement.setString(12, this.uuid.toString());
+        statement.setLong(13, this.time.getTime() / 1000);
         statement.addBatch();
     }
 }
