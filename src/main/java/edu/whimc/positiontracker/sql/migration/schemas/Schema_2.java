@@ -11,7 +11,7 @@ public class Schema_2 extends SchemaVersion {
             "ALTER TABLE whimc_player_positions ADD COLUMN gamemode VARCHAR(16);";
 
     public Schema_2() {
-        super(2, null);
+        super(2, new Schema_3());
     }
 
     @Override
