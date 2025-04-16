@@ -45,7 +45,5 @@ public class Schema_3 extends SchemaVersion {
         try (PreparedStatement addRegionMembers = connection.prepareStatement(ADD_REGION_MEMBERS)) {
             addRegionMembers.execute();
         }
-
-        }
     }
 }
