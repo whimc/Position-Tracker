@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.UUID;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 public class RegionEntry extends DataEntry {
@@ -52,7 +54,14 @@ public class RegionEntry extends DataEntry {
     public RegionEntry(RegionEvent event) {
         Location loc = event.getLocation();
         this.regionName = event.getRegion().getId();
-        this.regionMembers = String.join(",", event.getRegion().getMembers().getPlayers());
+        this.regionMembers = String.join(",",
+                event.getRegion().getMembers().getUniqueIds().stream()
+                        .map(uuid -> {
+                            String name = Bukkit.getOfflinePlayer(uuid).getName(); //convert UUID to username
+                            return (name != null) ? name : uuid.toString(); // fallback if name unknown
+                        })
+                        .toList()
+        );
         this.trigger = event.getTrigger();
         this.isEnter = event instanceof RegionLeaveEvent;
         this.x = loc.getBlockX();

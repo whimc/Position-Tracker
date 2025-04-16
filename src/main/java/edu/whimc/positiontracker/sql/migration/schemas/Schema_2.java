@@ -8,7 +8,7 @@ import java.sql.SQLException;
 public class Schema_2 extends SchemaVersion {
 
     private static final String ADD_GAMEMODE =
-            "ALTER TABLE whimc_player_positions ADD COLUMN gamemode VARCHAR(16);";
+            "ALTER TABLE whimc_player_positions ADD COLUMN gamemode VARCHAR(16) AFTER username;";
 
     public Schema_2() {
         super(2, new Schema_3());

@@ -52,8 +52,13 @@ public class SchemaManager {
             if (schema.getVersion() > curVersion) {
                 this.plugin.getLogger().info("Migrating to schema " + schema.getVersion() + "...");
                 if (!schema.migrate(this)) {
+                    this.plugin.getLogger().severe("Migration to schema " + schema.getVersion() + " failed.");
                     return false;
+                } else {
+                    this.plugin.getLogger().info("Migration to schema " + schema.getVersion() + " completed.");
                 }
+            } else {
+                this.plugin.getLogger().info("Skipping schema " + schema.getVersion() + ", already applied.");
             }
             schema = schema.getNextSchema();
         }
