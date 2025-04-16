@@ -46,7 +46,8 @@ public class PositionEntry extends DataEntry {
         this.z = loc.getBlockZ();
         this.yaw = loc.getYaw();
         this.pitch = loc.getPitch();
-        this.world = loc.getWorld().getName();
+        /* default to unknown if null pointer exception: */
+        this.world = (loc.getWorld() != null) ? loc.getWorld().getName() : "unknown";
         String biome;
         try {
             biome = loc.getBlock().getBiome().name();

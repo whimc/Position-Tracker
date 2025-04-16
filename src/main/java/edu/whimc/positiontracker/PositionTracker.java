@@ -34,7 +34,13 @@ public class PositionTracker extends JavaPlugin {
         getConfig().options().copyDefaults(false);
         this.debug = getConfig().getBoolean("debug", false);
 
-        getCommand("positiontracker").setExecutor(new TrackerCommand(this));
+        /* Defensive null check */
+        if (getCommand("positiontracker") != null) {
+            getCommand("positiontracker").setExecutor(new TrackerCommand(this));
+        } else {
+            getLogger().warning("Command 'positiontracker' is not defined in plugin.yml!");
+        }
+
 
         // Load WorldGuard-specific things if we have WorldGuard
         if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {

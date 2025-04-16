@@ -60,7 +60,8 @@ public class RegionEntry extends DataEntry {
         this.z = loc.getBlockZ();
         this.yaw = loc.getYaw();
         this.pitch = loc.getPitch();
-        this.world = loc.getWorld().getName();
+        /* default to unknown if null pointer exception: */
+        this.world = (loc.getWorld() != null) ? loc.getWorld().getName() : "unknown";
         this.username = event.getPlayer().getName();
         this.uuid = event.getPlayer().getUniqueId();
         this.time = new Timestamp(System.currentTimeMillis());
