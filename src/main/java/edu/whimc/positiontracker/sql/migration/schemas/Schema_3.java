@@ -19,7 +19,7 @@ public class Schema_3 extends SchemaVersion {
     private static final String ADD_REGION_PITCH =
             "ALTER TABLE whimc_player_region_events ADD COLUMN pitch FLOAT AFTER yaw;";
     private static final String ADD_REGION_MEMBERS =
-            "ALTER TABLE whimc_player_region_events ADD COLUMN region_members VARCHAR(64) AFTER region;";
+            "ALTER TABLE whimc_player_region_events ADD COLUMN region_members TEXT AFTER region;";
 
     public Schema_3() {
         super(3, null);  // No newer schema after this one (yet)
