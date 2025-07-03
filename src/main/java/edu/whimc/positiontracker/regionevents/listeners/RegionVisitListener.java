@@ -23,8 +23,19 @@ public class RegionVisitListener implements Listener {
     public void onRegionEnter(RegionEnterEvent event) {
         ProtectedRegion region = event.getRegion();
 
+        // Defensive: only proceed if region's world matches the player's world
+        if (!event.getFrom().getWorld().equals(event.getTo().getWorld())) {
+            return; // unlikely, but safe
+        }
+        if (!event.getTo().getWorld().getName().equals(event.getPlayer().getWorld().getName())) {
+            return; // redundant but safe
+        }
+
         // Only react to regions with BASE_ prefix
-        if (!region.getId().startsWith("BASE_")) return;
+        if (!region.getId().startsWith("base_")) return;
+
+        // Exclude region named "perimeter" exactly (case-insensitive or not? Here: case-insensitive example)
+        if (region.getId().equalsIgnoreCase("perimeter")) return;
 
         UUID playerId = event.getPlayer().getUniqueId();
         Set<UUID> memberIds = region.getMembers().getUniqueIds();
@@ -40,6 +51,6 @@ public class RegionVisitListener implements Listener {
         plugin.getDataStore().addEntry(entry);
 
         //debug logging
-        plugin.getLogger().info("VISIT trigger fired for " + event.getPlayer().getName() + " in " + region.getId());
+        plugin.debugLog("VISIT fired: " + region.getId() + " in world " + event.getTo().getWorld().getName());
     }
 }
