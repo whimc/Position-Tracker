@@ -40,7 +40,7 @@ public class RegionVisitListener implements Listener {
         if (memberIds.contains(playerId)) return;
         if (memberIds.isEmpty() || (memberIds.size() == 1 && memberIds.contains(playerId))) return;
 
-        plugin.getDataStore().addEntry(new RegionEntry(event));
+        plugin.getDataStore().addEntry(new RegionEntry(event));Re
         plugin.debugLog("VISIT fired: " + region.getId() + " in world " + event.getTo().getWorld().getName());
     }
 }
