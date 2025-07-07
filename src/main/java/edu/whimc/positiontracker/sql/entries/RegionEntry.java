@@ -17,38 +17,14 @@ public class RegionEntry extends DataEntry {
             "INSERT INTO `whimc_player_region_events` (`region`, `region_members`, `trigger`, `isEnter`, `x`, `y`, `z`, `yaw`, `pitch`, `world`, `username`, `uuid`, `time`) " +
                     "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    /**
-     * The region's name.
-     */
     private final String regionName;
-    /**
-     * The members of the region at the time of the event.
-     */
     private final String regionMembers;
-    /**
-     * The type of action that caused the event.
-     */
-    private final RegionTrigger trigger;
-    /**
-     * Whether this is an enter (or leave) event.
-     */
+    private RegionTrigger trigger;  // ⬅️ no longer final!
     private final boolean isEnter;
-    /**
-     * The x, y, and z coordinates representing the position as well as the angle they're looking.
-     */
     private final int x, y, z;
     private final float yaw, pitch;
-    /**
-     * The current world and player's username.
-     */
     private final String world, username;
-    /**
-     * The unique ID for this entry.
-     */
     private final UUID uuid;
-    /**
-     * The time the entry was created.
-     */
     private final Timestamp time;
 
     public RegionEntry(RegionEvent event) {
@@ -57,8 +33,8 @@ public class RegionEntry extends DataEntry {
         this.regionMembers = String.join(",",
                 event.getRegion().getMembers().getUniqueIds().stream()
                         .map(uuid -> {
-                            String name = Bukkit.getOfflinePlayer(uuid).getName(); //convert UUID to username
-                            return (name != null) ? name : uuid.toString(); // fallback if name unknown
+                            String name = Bukkit.getOfflinePlayer(uuid).getName();
+                            return (name != null) ? name : uuid.toString();
                         })
                         .toList()
         );
@@ -69,11 +45,15 @@ public class RegionEntry extends DataEntry {
         this.z = loc.getBlockZ();
         this.yaw = loc.getYaw();
         this.pitch = loc.getPitch();
-        /* default to unknown if null pointer exception: */
         this.world = (loc.getWorld() != null) ? loc.getWorld().getName() : "unknown";
         this.username = event.getPlayer().getName();
         this.uuid = event.getPlayer().getUniqueId();
         this.time = new Timestamp(System.currentTimeMillis());
+    }
+
+    public RegionEntry(RegionEvent event, RegionTrigger overrideTrigger) {
+        this(event);
+        this.trigger = overrideTrigger;
     }
 
     @Override

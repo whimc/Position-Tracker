@@ -3,6 +3,7 @@ package edu.whimc.positiontracker.regionevents.listeners;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import edu.whimc.positiontracker.PositionTracker;
 import edu.whimc.positiontracker.regionevents.events.RegionEnterEvent;
+import edu.whimc.positiontracker.regionevents.objects.RegionTrigger;
 import edu.whimc.positiontracker.sql.entries.RegionEntry;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -23,14 +24,8 @@ public class RegionVisitListener implements Listener {
     public void onRegionEnter(RegionEnterEvent event) {
         ProtectedRegion region = event.getRegion();
 
-        // Defensive: world consistency check
         if (!event.getFrom().getWorld().equals(event.getTo().getWorld())) return;
-        if (!event.getTo().getWorld().getName().equals(event.getPlayer().getWorld().getName())) return;
-
-        // Only react to regions with BASE_ prefix (case-insensitive)
         if (!region.getId().toLowerCase().startsWith("base_")) return;
-
-        // Exclude region named exactly perimeter
         if (region.getId().equalsIgnoreCase("perimeter")) return;
         if (region.getMembers() == null) return;
 
@@ -40,7 +35,9 @@ public class RegionVisitListener implements Listener {
         if (memberIds.contains(playerId)) return;
         if (memberIds.isEmpty() || (memberIds.size() == 1 && memberIds.contains(playerId))) return;
 
-        plugin.getDataStore().addEntry(new RegionEntry(event));
+        RegionEntry entry = new RegionEntry(event, RegionTrigger.VISIT); // force VISIT
+        plugin.getDataStore().addEntry(entry);
+
         plugin.debugLog("VISIT fired: " + region.getId() + " in world " + event.getTo().getWorld().getName());
     }
 }
