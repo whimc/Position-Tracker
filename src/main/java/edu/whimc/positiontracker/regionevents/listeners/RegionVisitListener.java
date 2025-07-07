@@ -23,23 +23,24 @@ public class RegionVisitListener implements Listener {
     public void onRegionEnter(RegionEnterEvent event) {
         ProtectedRegion region = event.getRegion();
 
-        // Only react to regions with BASE_ prefix
-        if (!region.getId().startsWith("BASE_")) return;
+        // Defensive: world consistency check
+        if (!event.getFrom().getWorld().equals(event.getTo().getWorld())) return;
+        if (!event.getTo().getWorld().getName().equals(event.getPlayer().getWorld().getName())) return;
+
+        // Only react to regions with BASE_ prefix (case-insensitive)
+        if (!region.getId().toLowerCase().startsWith("base_")) return;
+
+        // Exclude region named exactly perimeter
+        if (region.getId().equalsIgnoreCase("perimeter")) return;
+        if (region.getMembers() == null) return;
 
         UUID playerId = event.getPlayer().getUniqueId();
         Set<UUID> memberIds = region.getMembers().getUniqueIds();
 
-        // Skip if player is a member
         if (memberIds.contains(playerId)) return;
-
-        // Skip if there are no other members
         if (memberIds.isEmpty() || (memberIds.size() == 1 && memberIds.contains(playerId))) return;
 
-        // Create and queue the RegionEntry to be saved to the database
-        RegionEntry entry = new RegionEntry(event);
-        plugin.getDataStore().addEntry(entry);
-
-        //debug logging
-        plugin.getLogger().info("VISIT trigger fired for " + event.getPlayer().getName() + " in " + region.getId());
+        plugin.getDataStore().addEntry(new RegionEntry(event));
+        plugin.debugLog("VISIT fired: " + region.getId() + " in world " + event.getTo().getWorld().getName());
     }
 }
