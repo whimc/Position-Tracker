@@ -61,11 +61,6 @@ public class RegionListeners implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
-    public void onVisit(PlayerMoveEvent event) {
-        this.cache.updateRegions(RegionTrigger.VISIT, event.getPlayer(), event.getFrom(), event.getTo());
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     public void onTeleport(PlayerTeleportEvent event) {
         this.cache.updateRegions(RegionTrigger.TELEPORT, event.getPlayer(), event.getFrom(), event.getTo());
     }
