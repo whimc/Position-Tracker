@@ -8,12 +8,13 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    # Avoid re-running when the version-bump commit is pushed back to master
+    # Avoid re-running when a version-bump PR is merged back to master
     if: ${{ github.event_name == 'workflow_dispatch' || !startsWith(github.event.head_commit.message, 'Release v') }}
 
     steps:
@@ -57,17 +58,40 @@ jobs:
       - name: Build shaded jar
         run: mvn -B clean package
 
-      - name: Commit version bump
+      - name: Commit version bump on release branch
+        id: branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
+          VERSION="${{ steps.version.outputs.next }}"
+          BRANCH="release/v${VERSION}"
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout -B "$BRANCH"
           git add pom.xml
-          git commit -m "Release v${{ steps.version.outputs.next }}"
-          git tag "v${{ steps.version.outputs.next }}"
-          git push origin HEAD:"${{ github.ref_name }}"
-          git push origin "v${{ steps.version.outputs.next }}"
+          git commit -m "Release v${VERSION}"
+          git tag "v${VERSION}"
+          git push -u origin "$BRANCH"
+          git push origin "v${VERSION}"
+
+          PR_URL=$(gh pr create \
+            --base master \
+            --head "$BRANCH" \
+            --title "Release v${VERSION}" \
+            --body "Automated patch bump and release packaging for v${VERSION}." \
+            || true)
+
+          # Try auto-merge when branch protection allows; otherwise leave the PR open.
+          if [[ -n "${PR_URL}" ]]; then
+            gh pr merge --auto --squash "$PR_URL" || true
+          fi
+
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "pr=${PR_URL}" >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub Release
         env:
@@ -79,4 +103,5 @@ jobs:
           JAR="target/WHIMC-PositionTracker-${VERSION}.jar"
           gh release create "v${VERSION}" "$JAR" \
             --title "WHIMC-PositionTracker-${VERSION}" \
-            --notes "Automated release for v${VERSION}."
+            --notes "Automated release for v${VERSION}." \
+            --latest
