@@ -19,7 +19,7 @@ public class RegionEntry extends DataEntry {
 
     private final String regionName;
     private final String regionMembers;
-    private RegionTrigger trigger;  // ⬅️ no longer final!
+    private RegionTrigger trigger;
     private final boolean isEnter;
     private final int x, y, z;
     private final float yaw, pitch;
@@ -39,7 +39,7 @@ public class RegionEntry extends DataEntry {
                         .toList()
         );
         this.trigger = event.getTrigger();
-        this.isEnter = event instanceof RegionLeaveEvent;
+        this.isEnter = !(event instanceof RegionLeaveEvent);
         this.x = loc.getBlockX();
         this.y = loc.getBlockY();
         this.z = loc.getBlockZ();

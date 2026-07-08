@@ -9,12 +9,10 @@
 	<description>Track player positions to a database</description>
 
 	<repositories>
-		<!-- This adds the Spigot Maven repository to the build -->
 		<repository>
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
 		</repository>
-		<!-- Repo for WorldGuard -->
 		<repository>
 			<id>sk89q-repo</id>
 			<url>https://maven.enginehub.org/repo/</url>
@@ -22,42 +20,40 @@
 	</repositories>
 
 	<dependencies>
-		<!--This adds the Spigot API artifact to the build -->
+		<!-- Compile against 1.20.4 API; runtime soft-compatible through 1.21.x for used APIs -->
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.13.2-R0.1-SNAPSHOT</version>
+			<version>1.20.4-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- MySql Connector -->
+		<!-- Fixed CVE-2023-22102 and later Connector/J advisories (use 9.3.0+) -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.28</version>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<version>9.3.0</version>
 		</dependency>
-		<!-- WorldGuard -->
+		<!-- Compile against a 1.20.x WorldGuard; servers need matching runtime WG per MC version -->
 		<dependency>
 			<groupId>com.sk89q.worldguard</groupId>
 			<artifactId>worldguard-bukkit</artifactId>
-			<version>7.0.7</version>
+			<version>7.0.9</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
 	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.release>17</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-	<!-- Repo for plugin -->
 	<scm>
 		<connection>scm:git:git@github.com:whimc/Position-Tracker.git</connection>
 		<tag>HEAD</tag>
 	</scm>
 
 	<build>
-		<!-- Allow pom.xml value substitution in plugin.yml -->
+		<finalName>${project.artifactId}-${project.version}</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -65,8 +61,48 @@
 			</resource>
 		</resources>
 
-		<!-- Github release settings -->
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.13.0</version>
+				<configuration>
+					<release>17</release>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.6.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<minimizeJar>false</minimizeJar>
+							<relocations>
+								<relocation>
+									<pattern>com.mysql</pattern>
+									<shadedPattern>edu.whimc.positiontracker.libs.mysql</shadedPattern>
+								</relocation>
+							</relocations>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>de.jutzig</groupId>
 				<artifactId>github-release-plugin</artifactId>
@@ -78,6 +114,9 @@
 					<fileSets>
 						<fileSet>
 							<directory>${project.build.directory}</directory>
+							<includes>
+								<include>${project.build.finalName}.jar</include>
+							</includes>
 						</fileSet>
 					</fileSets>
 				</configuration>

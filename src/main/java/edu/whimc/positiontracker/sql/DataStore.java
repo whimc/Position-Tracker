@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 
 /**
@@ -132,7 +133,8 @@ public class DataStore {
                 }
                 connection.commit();
             } catch (SQLException e) {
-                e.printStackTrace();
+                this.plugin.getLogger().log(Level.SEVERE,
+                        "Failed to flush position tracker data to MySQL", e);
             }
         });
     }

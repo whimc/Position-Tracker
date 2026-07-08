@@ -54,6 +54,7 @@ public class PositionTracker extends JavaPlugin {
         this.dataStore = new DataStore(this, success -> {
             if (success) {
                 this.dataStore.run();
+                startPositionPolling();
                 this.getLogger().info("---- PositionTracker has started! ----");
             } else {
                 this.getLogger().severe("Could not create MySQL connection! Disabling plugin...");
@@ -61,15 +62,16 @@ public class PositionTracker extends JavaPlugin {
             }
         });
 
-        // Poll player data every few seconds
+        getServer().getPluginManager().registerEvents(new RegionVisitListener(this), this);
+    }
+
+    private void startPositionPolling() {
         int pollInterval = getConfig().getInt("position_poll_interval_seconds", 2) * 20;
         Bukkit.getScheduler().runTaskTimer(this,
                 () -> Bukkit.getOnlinePlayers().stream()
                         .map(PositionEntry::new)
                         .forEach(this.dataStore::addData),
-                0, pollInterval);
-
-        getServer().getPluginManager().registerEvents(new RegionVisitListener(this), this);
+                pollInterval, pollInterval);
     }
 
     public DataStore getDataStore() {

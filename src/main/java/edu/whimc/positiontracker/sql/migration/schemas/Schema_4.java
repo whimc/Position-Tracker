@@ -6,10 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Schema_3 extends SchemaVersion {
+/**
+ * Repair migration for installs that were marked as schema 3 without receiving all expected
+ * columns (older Schema_3 wrote region yaw against the positions table).
+ */
+public class Schema_4 extends SchemaVersion {
 
-    public Schema_3() {
-        super(3, new Schema_4());
+    public Schema_4() {
+        super(4, null);
     }
 
     @Override
@@ -18,6 +22,8 @@ public class Schema_3 extends SchemaVersion {
                 "ALTER TABLE whimc_player_positions ADD COLUMN yaw FLOAT AFTER z");
         addColumnIfMissing(connection, "whimc_player_positions", "pitch",
                 "ALTER TABLE whimc_player_positions ADD COLUMN pitch FLOAT AFTER yaw");
+        addColumnIfMissing(connection, "whimc_player_positions", "gamemode",
+                "ALTER TABLE whimc_player_positions ADD COLUMN gamemode VARCHAR(16) AFTER username");
 
         addColumnIfMissing(connection, "whimc_player_region_events", "yaw",
                 "ALTER TABLE whimc_player_region_events ADD COLUMN yaw FLOAT AFTER z");
