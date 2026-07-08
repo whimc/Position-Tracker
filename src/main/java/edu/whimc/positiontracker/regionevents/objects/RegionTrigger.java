@@ -6,5 +6,6 @@ public enum RegionTrigger {
     KICK,
     TELEPORT,
     RESPAWN,
-    MOVE
+    MOVE,
+    VISIT
 }

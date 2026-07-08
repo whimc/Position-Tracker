@@ -1,21 +1,27 @@
-name: "Compile"
+name: Compile
 
 on:
   pull_request:
+  push:
+    branches:
+      - master
+      - QRF-data
 
 jobs:
-  release:
-    name: "Compile"
-    runs-on: "ubuntu-latest"
+  compile:
+    name: Compile
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 1.16
-        uses: actions/setup-java@v1
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
         with:
-          java-version: 1.16
+          distribution: temurin
+          java-version: "21"
+          cache: maven
 
       - name: Compile
-        run: mvn clean package
+        run: mvn -B clean package

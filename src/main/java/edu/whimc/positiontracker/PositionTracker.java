@@ -1,11 +1,13 @@
 package edu.whimc.positiontracker;
 
 import edu.whimc.positiontracker.listeners.RegionEnterLeaveListener;
+import edu.whimc.positiontracker.regionevents.listeners.RegionVisitListener;
 import edu.whimc.positiontracker.regionevents.listeners.RegionListeners;
 import edu.whimc.positiontracker.regionevents.objects.WgPlayerCache;
 import edu.whimc.positiontracker.sql.DataStore;
 import edu.whimc.positiontracker.sql.entries.PositionEntry;
 import org.bukkit.Bukkit;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -20,10 +22,6 @@ public class PositionTracker extends JavaPlugin {
      * The DataStore for the SQL database.
      */
     private DataStore dataStore;
-    /**
-     * Cache for per-player WorldGuard regions.
-     */
-    private WgPlayerCache wgPlayerCache;
 
     /**
      * {@inheritDoc}
@@ -34,9 +32,10 @@ public class PositionTracker extends JavaPlugin {
         getConfig().options().copyDefaults(false);
         this.debug = getConfig().getBoolean("debug", false);
 
-        /* Defensive null check */
-        if (getCommand("positiontracker") != null) {
-            getCommand("positiontracker").setExecutor(new TrackerCommand(this));
+        // Safely register the command
+        PluginCommand command = getCommand("positiontracker");
+        if (command != null) {
+            command.setExecutor(new TrackerCommand(this));
         } else {
             getLogger().warning("Command 'positiontracker' is not defined in plugin.yml!");
         }
@@ -44,8 +43,8 @@ public class PositionTracker extends JavaPlugin {
 
         // Load WorldGuard-specific things if we have WorldGuard
         if (Bukkit.getPluginManager().isPluginEnabled("WorldGuard")) {
-            this.wgPlayerCache = new WgPlayerCache(this);
-            Bukkit.getPluginManager().registerEvents(new RegionListeners(this, this.wgPlayerCache), this);
+            WgPlayerCache wgPlayerCache = new WgPlayerCache(this);
+            Bukkit.getPluginManager().registerEvents(new RegionListeners(this, wgPlayerCache), this);
             Bukkit.getPluginManager().registerEvents(new RegionEnterLeaveListener(this), this);
             this.getLogger().info("WorldGuard integration enabled.");
         } else {
@@ -55,6 +54,7 @@ public class PositionTracker extends JavaPlugin {
         this.dataStore = new DataStore(this, success -> {
             if (success) {
                 this.dataStore.run();
+                startPositionPolling();
                 this.getLogger().info("---- PositionTracker has started! ----");
             } else {
                 this.getLogger().severe("Could not create MySQL connection! Disabling plugin...");
@@ -62,12 +62,16 @@ public class PositionTracker extends JavaPlugin {
             }
         });
 
-        // Poll player data every few seconds
+        getServer().getPluginManager().registerEvents(new RegionVisitListener(this), this);
+    }
+
+    private void startPositionPolling() {
         int pollInterval = getConfig().getInt("position_poll_interval_seconds", 2) * 20;
         Bukkit.getScheduler().runTaskTimer(this,
-                () -> Bukkit.getOnlinePlayers().stream().map(PositionEntry::new).forEach(this.dataStore::addData), 0,
-                pollInterval);
-
+                () -> Bukkit.getOnlinePlayers().stream()
+                        .map(PositionEntry::new)
+                        .forEach(this.dataStore::addData),
+                pollInterval, pollInterval);
     }
 
     public DataStore getDataStore() {

@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 
 /**
@@ -54,14 +55,12 @@ public class DataStore {
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             final boolean success = this.sqlConnection.initialize();
-            Bukkit.getScheduler().runTask(plugin, () -> {
-                callback.accept(success);
-            });
+            Bukkit.getScheduler().runTask(plugin, () -> callback.accept(success));
         });
     }
 
     /**
-     * Start flushing data points to the database. Does nothing if already running
+     * Start flushing data points to the database. Does nothing if already running.
      */
     public void run() {
         if (isRunning()) {
@@ -102,7 +101,7 @@ public class DataStore {
     }
 
     /**
-     * Flushes all queued data to the database
+     * Flushes all queued data to the database.
      */
     public void flushToDatabase() {
         // Add data to database asynchronously
@@ -111,10 +110,11 @@ public class DataStore {
                 connection.setAutoCommit(false);
                 try (PreparedStatement positions = connection.prepareStatement(PositionEntry.INSERT_QUERY);
                      PreparedStatement regionChanges = connection.prepareStatement(RegionEntry.INSERT_QUERY)) {
-                    // Flush all messages from the queue
+
                     if (!this.entries.isEmpty()) {
                         this.plugin.debugLog("Logging " + this.entries.size() + " data points");
                     }
+
                     while (!this.entries.isEmpty()) {
                         DataEntry entry = this.entries.poll();
 
@@ -127,13 +127,25 @@ public class DataStore {
                             throw new RuntimeException("Unhandled DataEntry type " + entry.getClass().getSimpleName());
                         }
                     }
+
                     positions.executeBatch();
                     regionChanges.executeBatch();
                 }
                 connection.commit();
             } catch (SQLException e) {
-                e.printStackTrace();
+                this.plugin.getLogger().log(Level.SEVERE,
+                        "Failed to flush position tracker data to MySQL", e);
             }
         });
+    }
+
+    /**
+     * Public method to queue an entry; warns if rejected.
+     */
+    public void addEntry(DataEntry entry) {
+        boolean accepted = this.addData(entry);
+        if (!accepted) {
+            plugin.getLogger().warning("Rejected entry because DataStore is not running: " + entry.getClass().getSimpleName());
+        }
     }
 }

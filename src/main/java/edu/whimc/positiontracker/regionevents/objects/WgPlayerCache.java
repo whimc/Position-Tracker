@@ -10,8 +10,8 @@ import org.bukkit.entity.Player;
 
 public class WgPlayerCache {
 
-    private PositionTracker plugin;
-    private Map<UUID, WgPlayer> cache = new HashMap<>();
+    private final PositionTracker plugin;
+    private final Map<UUID, WgPlayer> cache = new HashMap<>();
 
     public WgPlayerCache(PositionTracker plugin) {
         this.plugin = plugin;
