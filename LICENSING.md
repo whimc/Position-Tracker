@@ -1,0 +1,1 @@
+The MIT license in LICENSE applies to original project software that WHIMC and its contributors have authority to license. Third-party software and bundled dependencies retain their respective terms. Datasets, learner records, model weights, maps, artwork, and other non-code assets require their own permission for reuse.
